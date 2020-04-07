@@ -47,7 +47,7 @@ Drawer drawer(var context) {
         _drawerListTile(context, "Today's Schedule", Home()),
         ListTile(
             title: Text("Edit and Add Schedule", style: TextStyle(
-              color: Colors.blue[400],
+              color: Colors.blue[600],
             )),
             onTap: () async{
               List<Schedule> scheduleList = await SchedulePreference.getScheduleList();
@@ -94,6 +94,7 @@ class PlanCardState extends State<PlanCard> {
     }else{
       this.cardLength = (60*(hourDif) - minutesDif).toDouble();
     }
+    
   }
 
   String formatSmallerTenTime(int time) {
@@ -108,6 +109,7 @@ class PlanCardState extends State<PlanCard> {
     String startMinu = formatSmallerTenTime(start.minute);
     String endHour = formatSmallerTenTime(end.hour);
     String endMinu = formatSmallerTenTime(end.minute);
+    if(cardLength<30) cardLength = 30;
     return Container(
       height: cardLength,
       child: Card(
