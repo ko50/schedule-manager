@@ -13,8 +13,13 @@ class TodaysSchedule extends Schedule {
   List planList;
 
   TodaysSchedule({this.schedule}) {
-    this.name = schedule.name;
-    this.planList = schedule.planList;
+    if(schedule==null) {
+      this.name = "undifined";
+      this.planList = [];
+    }else{
+      this.name = schedule.name;
+      this.planList = schedule.planList;
+    }
   }
 
   TodaysSchedule.fromJson(Map<String, dynamic> json)
@@ -33,21 +38,21 @@ class TodaysSchedulePreference {
     SharedPreferences pref = await SharedPreferences.getInstance();
     if(!pref.containsKey("FutureScheduleMap")){
       pref.setString("FutureScheduleMap", "");
-      return {"today": null, "tomorrow": null};
+      return {"today": TodaysSchedule(), "tomorrow": TodaysSchedule()};
     }
 
     if(pref.getString("FutureScheduleMap")=="") {
-      return {"today": null, "tomorrow": null};
+      return {"today": TodaysSchedule(), "tomorrow": TodaysSchedule()};
     }
 
-    List<dynamic> jsonList = json.decode(pref.getString("FutureScheduleMap"));
-    Map<String, TodaysSchedule> futureScheduleMap = {"today": null, "tomorrow": null};
+    dynamic myJson = json.decode(pref.getString("FutureScheduleMap"));
+    Map<String, TodaysSchedule> futureScheduleMap = {"today": TodaysSchedule(), "tomorrow": TodaysSchedule()};
 
-    futureScheduleMap["today"] = TodaysSchedule.fromJson(jsonList[0] ??= {
+    futureScheduleMap["today"] = TodaysSchedule.fromJson(myJson["today"] ??= {
         "name":    "",
         "planList": [],
       });
-    futureScheduleMap["tomorrow"] = TodaysSchedule.fromJson(jsonList[1] ??= {
+    futureScheduleMap["tomorrow"] = TodaysSchedule.fromJson(myJson["tomorrow"] ??= {
         "name":    "",
         "planList": [],
       });
@@ -78,7 +83,7 @@ class TodayPlanListViewState extends State<TodayPlanListView> with WidgetsBindin
 
   @override
   Widget build(BuildContext context) {
-    if(todaysSchedule.planList==null || todaysSchedule.planList.length==0) {
+    if(todaysSchedule.planList==null || todaysSchedule.planList.length==0 || todaysSchedule.name=="undifined") {
       return Center(child: Text("このスケジュールには\n予定が何もないです\nまずはなんか追加しろカス", style: TextStyle(fontSize: 40)));
     }else{
       return ListView.builder(

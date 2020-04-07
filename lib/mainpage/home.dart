@@ -16,6 +16,7 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
   DateTime now = DateTime.now();
   Timer timer;
   int seconds;
+  String name;
 
   HomeState() {
     seconds = 60 - now.second;
@@ -127,16 +128,22 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
     if(futureScheduleMap.length==0) {
       return Center(child: Text("予定はなにもない平和な一日", style: TextStyle(fontSize: 30),),);
     }else{
-      todaysSchedule = futureScheduleMap["today"] ??= null;
+      todaysSchedule = futureScheduleMap["today"];
+      if(todaysSchedule==null) {
+        name = "undifined";
+      }else{
+        name = todaysSchedule.name;
+      }
+      print(todaysSchedule.name);
       if(now.hour==0 && now.minute==0) {
-        futureScheduleMap["today"] = futureScheduleMap["tomorrow"] ??= null;
-        futureScheduleMap["tomorrow"] = null;
+        futureScheduleMap["today"] = futureScheduleMap["tomorrow"];
+        futureScheduleMap["tomorrow"] = TodaysSchedule();
         TodaysSchedulePreference.saveTodaysSchedule(futureScheduleMap);
       }
-      if(todaysSchedule==null || todaysSchedule.planList==null || todaysSchedule.planList==[]) {
+      if(todaysSchedule==null || todaysSchedule.planList==null || (todaysSchedule.name=="undifined" && todaysSchedule.planList==[])) {
         return Center(child: Text("予定はなにもない平和な一日", style: TextStyle(fontSize: 30),),);
       }else{
-        todaysSchedule.planList.forEach((plan) => print("appointed plan ${plan.name}"));
+        todaysSchedule.planList.forEach((plan) => print("appointed plan ${plan.name ??= "null"}"));
         return TodayPlanListView(todaysSchedule);
       }
     }
@@ -147,14 +154,14 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
     return Scaffold(
       drawer: drawer(context),
       appBar: AppBar(
-        title: Row(
+        title: Column(
           children: <Widget>[
             Text(
-              "今日の予定は ${todaysSchedule.name}",
+              "${DateFormat("MM/dd/yyyy HH:mm").format(now)}            ",
+              style: TextStyle(fontSize: 12),
             ),
             Text(
-              "    ただ今の時刻 ${DateFormat("MM/dd/yyyy HH:mm").format(now)}",
-              style: TextStyle(fontSize: 12),
+              "今日の予定は $name",
             ),
           ],
         ),
