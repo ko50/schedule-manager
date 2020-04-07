@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../tools/tool.dart';
 import './today.dart';
+import '../config/config.dart';
 
 /// TodaysScheduleを表示
 class Home extends StatefulWidget {
@@ -125,6 +126,7 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
 
   Future<Widget> loadTodaysSchedule() async{
     Map<String, TodaysSchedule> futureScheduleMap = await TodaysSchedulePreference.getFutureScheduleMap();
+    Config config = await ConfigPrefarence.getConfig();
     if(futureScheduleMap.length==0) {
       return Center(child: Text("予定はなにもない平和な一日", style: TextStyle(fontSize: 30),),);
     }else{
@@ -136,9 +138,11 @@ class HomeState extends State<Home> with WidgetsBindingObserver {
       }
       print(todaysSchedule.name);
       if(now.hour==0 && now.minute==0) {
-        futureScheduleMap["today"] = futureScheduleMap["tomorrow"];
-        futureScheduleMap["tomorrow"] = TodaysSchedule();
-        TodaysSchedulePreference.saveTodaysSchedule(futureScheduleMap);
+        if(!config.autoSetTomorrow) {
+          futureScheduleMap["today"] = futureScheduleMap["tomorrow"];
+          futureScheduleMap["tomorrow"] = TodaysSchedule();
+          TodaysSchedulePreference.saveTodaysSchedule(futureScheduleMap);
+        }
       }
       if(todaysSchedule==null || todaysSchedule.planList==null || (todaysSchedule.name=="undifined" && todaysSchedule.planList==[])) {
         return Center(child: Text("予定はなにもない平和な一日", style: TextStyle(fontSize: 30),),);

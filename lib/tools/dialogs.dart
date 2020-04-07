@@ -236,13 +236,16 @@ Future<List> setFutureScheudleDialog(context) async{
       return SimpleDialog(
         title: Text("Set Schedule"),
         children: <Widget>[
-          Text("Which do you want to set this schedule to?"),
+          Container(
+            padding: EdgeInsets.all(8.0),
+            child: Text("Which do you want to set this schedule to?"),
+          ),
           Flex(
             direction: Axis.horizontal,
             children: <Widget>[
               Expanded(
                 child: FlatButton(
-                  child: Text("-Today's Schedule"),
+                  child: Text("Today's Schedule"),
                   onPressed: () {
                     Navigator.of(context).pop([true, "today"]);
                   },
@@ -255,7 +258,7 @@ Future<List> setFutureScheudleDialog(context) async{
             children: <Widget>[
               Expanded(
                 child: FlatButton(
-                  child: Text("-Tomorrow's Schedule"),
+                  child: Text("Tomorrow's Schedule"),
                   onPressed: () {
                     Navigator.of(context).pop([true, "tomorrow"]);
                   },
@@ -268,5 +271,35 @@ Future<List> setFutureScheudleDialog(context) async{
     }
   );
   result ??= [false, ""];
+  return result;
+}
+
+/// 自動設定をオンにするときすでに明日の予定が設定されていた時どうするか尋ねる
+Future<bool> forceSettingDialog(context, String errorMessage) async{
+  bool result = await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("エラー"),
+        content: Text(errorMessage),
+        actions: <Widget>[
+          FlatButton(
+            child: Text("cancel"),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+          ),
+          FlatButton(
+            child: Text("ok"),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+        ],
+      );
+    }
+  );
+  result ??= false;
   return result;
 }
